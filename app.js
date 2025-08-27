@@ -5,6 +5,9 @@
   const limitInput = document.getElementById('limitInput');
   const loadBtn = document.getElementById('loadBtn');
   const useRecommendedBtn = document.getElementById('useRecommended');
+  const use100Btn = document.getElementById('use100');
+  const executeBtn = document.getElementById('executeBtn');
+  const resetDefaultBtn = document.getElementById('resetDefaultBtn');
   const statusEl = document.getElementById('status');
   const pageInfoEl = document.getElementById('pageInfo');
   const prevPageBtn = document.getElementById('prevPageBtn');
@@ -356,10 +359,15 @@
     } catch {}
   }
 
+  // Defaults
+  function defaultBreedsUrl() {
+    return 'https://catfact.ninja/breeds?limit=50&page=1';
+  }
+
   // Fetching
-  async function fetchAndRender(baseUrl) {
+  async function fetchAndRender(baseUrl, opts = { fallbackOnError: true }) {
     setStatus('Loading...');
-    const url = getUrlWithLimit(baseUrl, Number(limitInput.value));
+    const url = baseUrl;
 
     let resp;
     try {
@@ -367,11 +375,21 @@
     } catch (e) {
       setStatus('Network error.');
       console.error(e);
+      if (opts.fallbackOnError && window.confirm('Network error. Load default 50 records?')) {
+        urlInput.value = defaultBreedsUrl();
+        limitInput.value = '50';
+        return fetchAndRender(urlInput.value, { fallbackOnError: false });
+      }
       return;
     }
 
     if (!resp.ok) {
       setStatus(`Request failed: ${resp.status} ${resp.statusText}`);
+      if (opts.fallbackOnError && window.confirm('Request failed. Load default 50 records?')) {
+        urlInput.value = defaultBreedsUrl();
+        limitInput.value = '50';
+        return fetchAndRender(urlInput.value, { fallbackOnError: false });
+      }
       return;
     }
 
@@ -381,10 +399,23 @@
     } catch (e) {
       setStatus('Failed to parse JSON.');
       console.error(e);
+      if (opts.fallbackOnError && window.confirm('Failed to parse response. Load default 50 records?')) {
+        urlInput.value = defaultBreedsUrl();
+        limitInput.value = '50';
+        return fetchAndRender(urlInput.value, { fallbackOnError: false });
+      }
       return;
     }
 
     rawData = Array.isArray(json?.data) ? json.data : [];
+    if (rawData.length === 0 && opts.fallbackOnError) {
+      setStatus('No data returned.');
+      if (window.confirm('No data returned. Load default 50 records?')) {
+        urlInput.value = defaultBreedsUrl();
+        limitInput.value = '50';
+        return fetchAndRender(urlInput.value, { fallbackOnError: false });
+      }
+    }
 
     // pagination meta if available
     const current = json?.current_page ?? json?.meta?.current_page ?? null;
@@ -406,7 +437,24 @@
 
   // Events
   loadBtn.addEventListener('click', () => {
+    // Apply current limit and reset page=1
+    try {
+      const u = new URL(urlInput.value);
+      u.searchParams.set('limit', String(limitInput.value || '50'));
+      u.searchParams.set('page', '1');
+      urlInput.value = u.toString();
+    } catch {
+      // If invalid, set to default
+      urlInput.value = defaultBreedsUrl();
+      limitInput.value = '50';
+    }
     fetchAndRender(urlInput.value);
+    saveSettings();
+  });
+
+  if (executeBtn) executeBtn.addEventListener('click', () => {
+    // Load exactly the Request URL
+    fetchAndRender(urlInput.value, { fallbackOnError: true });
     saveSettings();
   });
 
@@ -422,6 +470,60 @@
     }
     saveSettings();
     fetchAndRender(urlInput.value);
+  });
+
+  if (use100Btn) use100Btn.addEventListener('click', () => {
+    try {
+      const u = new URL(urlInput.value);
+      u.searchParams.set('limit', '100');
+      u.searchParams.set('page', '1');
+      urlInput.value = u.toString();
+      limitInput.value = '100';
+    } catch (e) {
+      urlInput.value = 'https://catfact.ninja/breeds?limit=100&page=1';
+      limitInput.value = '100';
+    }
+    saveSettings();
+    fetchAndRender(urlInput.value);
+  });
+
+  if (resetDefaultBtn) resetDefaultBtn.addEventListener('click', () => {
+    try { localStorage.removeItem('cbv_state'); } catch {}
+    // Reset controls to defaults
+    urlInput.value = defaultBreedsUrl();
+    acceptHeaderInput.value = 'application/json';
+    limitInput.value = '50';
+
+    // Clear filters and sorting
+    if (breedFilterInput) breedFilterInput.value = '';
+    if (countryFilterInput) countryFilterInput.value = '';
+    if (globalSearchInput) globalSearchInput.value = '';
+    if (advBreed) advBreed.value = '';
+    if (advCountry) advCountry.value = '';
+    if (advOrigin) advOrigin.value = '';
+    if (advCoat) advCoat.value = '';
+    if (advPattern) advPattern.value = '';
+    if (advLogic) advLogic.value = 'AND';
+    sortState = { key: null, asc: true };
+
+    // Reset table pagination
+    if (tablePageSizeEl) tablePageSizeEl.value = '50';
+
+    // Reset facts section
+    const factsLimitInput = document.getElementById('factsLimit');
+    const factsMaxLenInput = document.getElementById('factsListMaxLen');
+    if (factsLimitInput) factsLimitInput.value = '10';
+    if (factsMaxLenInput) factsMaxLenInput.value = '';
+
+    // Random fact settings
+    if (factMaxLenInput) factMaxLenInput.value = '';
+    const autoRefreshFactInput = document.getElementById('autoRefreshFact');
+    const factIntervalSecInput = document.getElementById('factIntervalSec');
+    if (autoRefreshFactInput) autoRefreshFactInput.checked = false;
+    if (factIntervalSecInput) factIntervalSecInput.value = '30';
+
+    applyFiltersAndRender();
+    fetchAndRender(urlInput.value, { fallbackOnError: false });
   });
 
   limitInput.addEventListener('change', () => {
