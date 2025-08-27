@@ -31,25 +31,29 @@
     </section>
 
     <section class="controls">
+      <h2>Search</h2>
       <div class="control-row">
         <label for="urlInput">Request URL</label>
         <input id="urlInput" type="url" value="https://catfact.ninja/breeds?limit=1" />
         <button id="useRecommended">Use 50 per page</button>
         <button id="use100">Use 100 per page</button>
+        <button id="executeBtn" class="btn-primary">Execute</button>
       </div>
-      <div class="control-row">
-        <label for="acceptHeader">Accept header</label>
-        <input id="acceptHeader" type="text" value="application/json" />
-      </div>
+      <details id="advancedControls" class="advanced-filters">
+        <summary>Advanced</summary>
+        <div class="advanced-grid">
+          <label for="acceptHeader">Accept header</label>
+          <input id="acceptHeader" type="text" value="application/json" />
+        </div>
+      </details>
       <div class="control-row">
         <label for="limitInput">Limit</label>
         <input id="limitInput" type="number" min="1" max="100" step="1" value="1" />
         <button id="loadBtn">Load Data</button>
-        <button id="executeBtn" class="btn-primary">Execute</button>
         <button id="resetDefaultBtn">Load default, clear history and execute</button>
         <span id="status" aria-live="polite"></span>
       </div>
-      <h3 class="section-subheader">Filters</h3>
+      <h2>Filters</h2>
       <div class="control-row filters">
         <label for="breedFilter">Filter Breed</label>
         <input id="breedFilter" type="text" placeholder="e.g., Persian" />
