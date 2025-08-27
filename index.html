@@ -45,7 +45,7 @@
         <label for="limitInput">Limit</label>
         <input id="limitInput" type="number" min="1" max="100" step="1" value="1" />
         <button id="loadBtn">Load Data</button>
-        <button id="executeBtn">Execute</button>
+        <button id="executeBtn" class="btn-primary">Execute</button>
         <button id="resetDefaultBtn">Load default, clear history and execute</button>
         <span id="status" aria-live="polite"></span>
       </div>
@@ -164,6 +164,8 @@
     <footer>
       <small>Powered by <a href="https://catfact.ninja/" target="_blank" rel="noreferrer">catfact.ninja</a></small>
     </footer>
+
+    <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
     <script src="./app.js"></script>
   </body>

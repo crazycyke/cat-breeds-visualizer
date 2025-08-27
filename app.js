@@ -364,6 +364,41 @@
     return 'https://catfact.ninja/breeds?limit=50&page=1';
   }
 
+  // Toast helpers
+  function showToast(message, { actionLabel, onAction, duration = 6000 } = {}) {
+    const cont = document.getElementById('toastContainer');
+    if (!cont) return;
+    const t = document.createElement('div');
+    t.className = 'toast';
+    const p = document.createElement('p');
+    p.textContent = message;
+    const actions = document.createElement('div');
+    actions.className = 'toast-actions';
+    const dismiss = document.createElement('button');
+    dismiss.textContent = 'Dismiss';
+    dismiss.addEventListener('click', () => { cont.removeChild(t); });
+    actions.appendChild(dismiss);
+    if (actionLabel && onAction) {
+      const act = document.createElement('button');
+      act.textContent = actionLabel;
+      act.className = 'primary';
+      act.addEventListener('click', () => { try { onAction(); } finally { cont.removeChild(t); } });
+      actions.appendChild(act);
+    }
+    t.appendChild(p);
+    t.appendChild(actions);
+    cont.appendChild(t);
+    if (duration > 0) setTimeout(() => { if (t.parentNode) cont.removeChild(t); }, duration);
+  }
+
+  async function confirmToast(message, actionLabel) {
+    return new Promise(resolve => {
+      showToast(message, { actionLabel, onAction: () => resolve(true), duration: 8000 });
+      // Resolve false if dismissed after duration (best-effort)
+      setTimeout(() => resolve(false), 8200);
+    });
+  }
+
   // Fetching
   async function fetchAndRender(baseUrl, opts = { fallbackOnError: true }) {
     setStatus('Loading...');
@@ -375,20 +410,26 @@
     } catch (e) {
       setStatus('Network error.');
       console.error(e);
-      if (opts.fallbackOnError && window.confirm('Network error. Load default 50 records?')) {
-        urlInput.value = defaultBreedsUrl();
-        limitInput.value = '50';
-        return fetchAndRender(urlInput.value, { fallbackOnError: false });
+      if (opts.fallbackOnError) {
+        const ok = await confirmToast('Network error.', 'Load default 50');
+        if (ok) {
+          urlInput.value = defaultBreedsUrl();
+          limitInput.value = '50';
+          return fetchAndRender(urlInput.value, { fallbackOnError: false });
+        }
       }
       return;
     }
 
     if (!resp.ok) {
       setStatus(`Request failed: ${resp.status} ${resp.statusText}`);
-      if (opts.fallbackOnError && window.confirm('Request failed. Load default 50 records?')) {
-        urlInput.value = defaultBreedsUrl();
-        limitInput.value = '50';
-        return fetchAndRender(urlInput.value, { fallbackOnError: false });
+      if (opts.fallbackOnError) {
+        const ok = await confirmToast('Request failed.', 'Load default 50');
+        if (ok) {
+          urlInput.value = defaultBreedsUrl();
+          limitInput.value = '50';
+          return fetchAndRender(urlInput.value, { fallbackOnError: false });
+        }
       }
       return;
     }
@@ -399,10 +440,13 @@
     } catch (e) {
       setStatus('Failed to parse JSON.');
       console.error(e);
-      if (opts.fallbackOnError && window.confirm('Failed to parse response. Load default 50 records?')) {
-        urlInput.value = defaultBreedsUrl();
-        limitInput.value = '50';
-        return fetchAndRender(urlInput.value, { fallbackOnError: false });
+      if (opts.fallbackOnError) {
+        const ok = await confirmToast('Failed to parse response.', 'Load default 50');
+        if (ok) {
+          urlInput.value = defaultBreedsUrl();
+          limitInput.value = '50';
+          return fetchAndRender(urlInput.value, { fallbackOnError: false });
+        }
       }
       return;
     }
@@ -410,7 +454,8 @@
     rawData = Array.isArray(json?.data) ? json.data : [];
     if (rawData.length === 0 && opts.fallbackOnError) {
       setStatus('No data returned.');
-      if (window.confirm('No data returned. Load default 50 records?')) {
+      const ok = await confirmToast('No data returned.', 'Load default 50');
+      if (ok) {
         urlInput.value = defaultBreedsUrl();
         limitInput.value = '50';
         return fetchAndRender(urlInput.value, { fallbackOnError: false });
@@ -456,6 +501,14 @@
     // Load exactly the Request URL
     fetchAndRender(urlInput.value, { fallbackOnError: true });
     saveSettings();
+  });
+
+  // Make Enter in the URL field trigger Execute
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (executeBtn) executeBtn.click();
+    }
   });
 
   useRecommendedBtn.addEventListener('click', () => {

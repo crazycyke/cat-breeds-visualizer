@@ -26,6 +26,10 @@ Table of contents
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
+Live demo
+- If GitHub Pages is enabled, your app will be available at:
+  - https://crazycyke.github.io/cat-breeds-visualizer/
+
 Quick start
 - Option A: Open index.html directly in a modern browser.
 - Option B: Serve locally (recommended for GitHub Pages parity):
