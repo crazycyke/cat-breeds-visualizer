@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cat Breeds Visualizer</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Cat Breeds Visualizer</h1>
+      <p>Fetch and visualize cat breed data from a URL (works with catfact.ninja/breeds).</p>
+    </header>
+
+    <section class="facts-section">
+      <h2>Random Cat Fact</h2>
+      <div class="fact-card">
+        <div id="randomFactText">Loading a fact...</div>
+        <div class="fact-controls">
+          <label for="factMaxLen">Max fact length (characters)</label>
+          <input id="factMaxLen" type="number" min="0" step="1" placeholder="e.g., 140" />
+          <div class="fact-refresh">
+            <label class="auto-refresh"><input id="autoRefreshFact" type="checkbox" /> Auto-refresh</label>
+            <label for="factIntervalSec">every (sec)</label>
+            <input id="factIntervalSec" type="number" min="1" step="1" value="30" />
+          </div>
+          <button id="refreshFactBtn">Refresh Fact</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div class="control-row">
+        <label for="urlInput">Request URL</label>
+        <input id="urlInput" type="url" value="https://catfact.ninja/breeds?limit=1" />
+        <button id="useRecommended">Use 50 per page</button>
+      </div>
+      <div class="control-row">
+        <label for="acceptHeader">Accept header</label>
+        <input id="acceptHeader" type="text" value="application/json" />
+      </div>
+      <div class="control-row">
+        <label for="limitInput">Limit</label>
+        <input id="limitInput" type="number" min="1" max="100" step="1" value="1" />
+        <button id="loadBtn">Load Data</button>
+        <span id="status" aria-live="polite"></span>
+      </div>
+      <div class="control-row filters">
+        <label for="breedFilter">Filter Breed</label>
+        <input id="breedFilter" type="text" placeholder="e.g., Persian" />
+        <label for="countryFilter">Filter Country</label>
+        <input id="countryFilter" type="text" placeholder="e.g., United Kingdom" />
+        <button id="clearFiltersBtn">Clear Filters</button>
+      </div>
+      <div class="control-row pagination">
+        <button id="prevPageBtn" disabled>Prev Page</button>
+        <span id="pageInfo"></span>
+        <button id="nextPageBtn" disabled>Next Page</button>
+      </div>
+      <div class="control-row">
+        <label for="globalSearch">Search all columns</label>
+        <input id="globalSearch" type="text" placeholder="Type to search across breed, country, origin, coat, pattern" />
+      </div>
+      <div class="control-row active-filters-row">
+        <div id="activeFilters"></div>
+        <button id="clearAllFiltersBtn">Clear All Filters</button>
+      </div>
+      <details id="advPanel" class="advanced-filters">
+        <summary>Advanced filters</summary>
+        <div class="advanced-grid">
+          <label for="advBreed">Breed</label>
+          <input id="advBreed" type="text" placeholder="contains..." />
+          <label for="advCountry">Country</label>
+          <input id="advCountry" type="text" placeholder="contains..." />
+          <label for="advOrigin">Origin</label>
+          <input id="advOrigin" type="text" placeholder="contains..." />
+          <label for="advCoat">Coat</label>
+          <input id="advCoat" type="text" placeholder="contains..." />
+          <label for="advPattern">Pattern</label>
+          <input id="advPattern" type="text" placeholder="contains..." />
+          <label for="advLogic">Logic</label>
+          <select id="advLogic">
+            <option value="AND">AND (all must match)</option>
+            <option value="OR">OR (any may match)</option>
+          </select>
+        </div>
+      </details>
+    </section>
+
+    <main>
+      <section class="table-section">
+        <h2>Breeds</h2>
+        <div class="actions">
+          <button id="exportCsvBtn">Export CSV</button>
+        </div>
+        <div class="control-row table-pagination">
+          <label for="tablePageSize">Rows per page</label>
+          <select id="tablePageSize">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+          </select>
+          <button id="tablePrevBtn" disabled>Prev</button>
+          <span id="tablePageInfo"></span>
+          <button id="tableNextBtn" disabled>Next</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="breedsTable">
+            <thead>
+              <tr>
+                <th data-key="breed">Breed</th>
+                <th data-key="country">Country</th>
+                <th data-key="origin">Origin</th>
+                <th data-key="coat">Coat</th>
+                <th data-key="pattern">Pattern</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="chart-section">
+        <h2>Breeds by Country</h2>
+        <canvas id="countryChart" height="200"></canvas>
+      </section>
+
+      <section class="facts-list-section">
+        <h2>Facts</h2>
+        <div class="control-row">
+          <label for="factsLimit">Limit</label>
+          <input id="factsLimit" type="number" min="1" max="100" step="1" value="10" />
+          <label for="factsListMaxLen">Max fact length (characters)</label>
+          <input id="factsListMaxLen" type="number" min="0" step="1" placeholder="e.g., 140" />
+          <button id="loadFactsBtn">Load Facts</button>
+          <button id="exportFactsCsvBtn">Export CSV</button>
+        </div>
+        <div class="control-row pagination">
+          <button id="factsPrevBtn" disabled>Prev</button>
+          <span id="factsPageInfo"></span>
+          <button id="factsNextBtn" disabled>Next</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="factsTable">
+            <thead>
+              <tr>
+                <th>Fact</th>
+                <th>Length</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      <small>Powered by <a href="https://catfact.ninja/" target="_blank" rel="noreferrer">catfact.ninja</a></small>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+
