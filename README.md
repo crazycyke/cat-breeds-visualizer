@@ -12,6 +12,20 @@ Features
 - Facts list (GET /facts) with pagination, max_length filter, and CSV export
 - Settings persisted locally (URL, headers, filters, sort, pagination, auto-refresh)
 
+Table of contents
+- [Features](#features)
+- [Quick start](#quick-start)
+- [How to use](#how-to-use)
+- [Keyboard shortcuts / Quick tips](#keyboard-shortcuts--quick-tips)
+- [Advanced usage](#advanced-usage)
+- [Notes](#notes)
+- [Privacy](#privacy)
+- [Architecture (Mermaid)](#architecture-mermaid)
+- [Project structure](#project-structure)
+- [Development](#development)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+
 Quick start
 - Option A: Open index.html directly in a modern browser.
 - Option B: Serve locally (recommended for GitHub Pages parity):
@@ -49,6 +63,12 @@ How to use
 Notes
 - Some API responses include pagination metadata (current_page, last_page, total). The app surfaces that for the breeds request if available.
 - App state is saved to localStorage under the key cbv_state.
+
+Privacy
+- This app is client-side only; requests go directly from your browser to https://catfact.ninja
+- Your IP address and User-Agent are visible to the API provider, as with any direct HTTP request
+- No secrets are required or stored; settings are saved locally in your browser’s localStorage only
+- If you deploy this to a shared environment (e.g., GitHub Pages), be aware that all fetching occurs from visitors’ browsers
 
 Architecture (Mermaid)
 ```mermaid
@@ -90,25 +110,6 @@ Development
 - No build step; pure HTML/CSS/JS
 - Dependencies: Chart.js via CDN only
 - Works on any modern browser with network access to catfact.ninja
-
-GitHub setup
-1) Initialize and commit
-   - `git init`
-   - `git add .`
-   - `git commit -m "Initial commit: Cat Breeds Visualizer"`
-2) Create a GitHub repo and push (choose one):
-   - Using GitHub CLI:
-     - `gh repo create cat-breeds-visualizer --source=. --public --remote=origin --push`
-   - Manual:
-     - Create an empty repo on GitHub
-     - `git branch -M main`
-     - `git remote add origin <your repo url>`
-     - `git push -u origin main`
-3) GitHub Pages (optional)
-   - On GitHub: Settings → Pages → Build and deployment
-   - Source: Deploy from a branch
-   - Branch: main; Folder: /(root)
-   - Save. After a few minutes, your site will be available at the Pages URL.
 
 Troubleshooting
 - Network/CORS: catfact.ninja supports cross-origin requests; if a corporate proxy blocks it, try another network.
