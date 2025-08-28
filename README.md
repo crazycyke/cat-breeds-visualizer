@@ -2,7 +2,7 @@
 
 A lightweight, static web app to fetch and visualize cat breed data and facts from catfact.ninja.
 
-Table of contents
+## Table of contents
 - [Quick start](#quick-start)
 - [How to use](#how-to-use)
 - [Keyboard shortcuts / Quick tips](#keyboard-shortcuts--quick-tips)
@@ -15,7 +15,7 @@ Table of contents
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
-Features
+## Features
 - Fetch breeds from any compatible endpoint (default: https://catfact.ninja/breeds)
 - Clear separation of pagination:
   - API pagination controls (Prev/Next API Page) with server total indicator when available
@@ -36,17 +36,17 @@ Features
 - Facts list (GET /facts) with pagination, max_length filter, and CSV export
 - Settings persisted locally (URL, headers, filters, sort, pagination, auto-refresh)
 
-Live demo
+## Live demo
 - If GitHub Pages is enabled, your app will be available at your repository’s Pages URL.
 
-Quick start
+## Quick start
 - Option A: Open index.html directly in a modern browser.
 - Option B: Serve locally (recommended for GitHub Pages parity):
   - Python: `python3 -m http.server 8080`
   - Node (if installed): `npx http-server -p 8080`
   - Then open http://localhost:8080/
 
-How to use
+## How to use
 1) Random Cat Fact (top of page)
    - Max fact length (characters): limits the length returned by GET /fact
    - Auto-refresh: check to refresh every N seconds; adjust the interval as needed
@@ -80,7 +80,7 @@ How to use
    - Load Facts: fetch facts for the current page
    - Prev/Next to page through results; Export CSV for the current page
 
-Keyboard shortcuts / Quick tips
+## Keyboard shortcuts / Quick tips
 - Cmd/Ctrl+Enter: Execute (run the current Request URL)
 - /: Focus “Search all columns”
 - g: Focus “Request URL”
@@ -91,17 +91,17 @@ Keyboard shortcuts / Quick tips
 - Shift+[: Prev API Page
 - Shift+]: Next API Page
 
-Notes
+## Notes
 - Some API responses include pagination metadata (current_page, last_page, total). The app surfaces that for the breeds request if available.
 - App state is saved to localStorage under the key cbv_state.
 
-Privacy
+## Privacy
 - This app is client-side only; requests go directly from your browser to https://catfact.ninja
 - Your IP address and User-Agent are visible to the API provider, as with any direct HTTP request
 - No secrets are required or stored; settings are saved locally in your browser’s localStorage only
 - If you deploy this to a shared environment (e.g., GitHub Pages), be aware that all fetching occurs from visitors’ browsers
 
-Architecture (Mermaid)
+## Architecture (Mermaid)
 ```mermaid
 flowchart LR
   subgraph UI["Browser UI"]
@@ -140,22 +140,22 @@ flowchart LR
   class API,F,FL api;
 ```
 
-Project structure
+## Project structure
 - index.html — markup and controls
 - styles.css — dark theme, layout, table, chart, and control styling
 - app.js — data fetching, filtering, sorting, pagination, chart rendering, CSV export, persistence
 
-Development
+## Development
 - No build step; pure HTML/CSS/JS
 - Dependencies: Chart.js via CDN only
 - Works on any modern browser with network access to catfact.ninja
 
-Troubleshooting
+## Troubleshooting
 - Network/CORS: catfact.ninja supports cross-origin requests; if a corporate proxy blocks it, try another network.
 - Only 50 rows show after choosing 100 per page: the app now auto-raises server limit to match the table rows; if blocked, click Use 100 per page or adjust Limit, then Load Data or Execute.
 - Empty results: Increase the limit or clear filters; click Use 50 per page or raise the Limit.
 - Very large datasets: Use client-side pagination in the Breeds section to keep the UI responsive.
 
-License
+## License
 - This project is provided as-is. Add your preferred LICENSE file if you plan to publish broadly.
 
