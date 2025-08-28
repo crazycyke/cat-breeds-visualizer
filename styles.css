@@ -20,9 +20,11 @@ body {
 
 header, footer { padding: 16px 20px; }
 header {
+  position: relative;
   background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
   border-bottom: 1px solid var(--border);
 }
+.header-actions { position: absolute; top: 16px; right: 20px; display: flex; gap: 8px; }
 footer {
   border-top: 1px solid var(--border);
   color: var(--muted);
@@ -39,7 +41,7 @@ footer a { color: var(--accent); }
 
 .control-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 label { color: var(--muted); }
-#acceptHeader { width: 320px; }
+#acceptHeader { width: 220px; }
 /* Reduce URL and Limit sizes */
 #urlInput { width: min(390px, 45vw); }
 #limitInput { width: 110px; }
@@ -95,6 +97,23 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .advanced-grid {
   display: grid; grid-template-columns: repeat(6, minmax(120px, 1fr)); gap: 10px; align-items: center;
 }
+/* Advanced filters: keep fields close to labels using tight paired columns */
+#advPanel .advanced-grid {
+  display: grid;
+  grid-template-columns:
+    auto minmax(140px, 240px)
+    auto minmax(140px, 240px)
+    auto minmax(140px, 240px);
+  column-gap: 10px; /* match Request URL label→field spacing */
+  row-gap: 12px;
+  align-items: center;
+}
+/* Increase spacing before labels that begin a new pair to visually group pairs */
+#advPanel .advanced-grid > label { margin-left: 24px; }
+#advPanel .advanced-grid > label:nth-child(6n+1) { margin-left: 0; }
+
+/* Accept header row: label and input side-by-side with Request URL spacing */
+#advancedControls .advanced-grid { display: flex; align-items: center; gap: 10px; }
 .advanced-grid input, .advanced-grid select { width: 100%; }
 
 main { display: grid; gap: 20px; padding: 20px; }
@@ -134,6 +153,25 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 /* Toasts */
 #toastContainer { position: fixed; left: 50%; top: 35%; transform: translate(-50%, -50%); display: grid; gap: 8px; z-index: 9999; }
+
+/* Modal */
+.modal[hidden] { display: none; }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: grid; place-items: center; z-index: 9998; }
+.modal-content { background: #0e141b; border: 1px solid var(--border); color: var(--text); padding: 16px; border-radius: 8px; width: min(560px, 90vw); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+.modal-content h3 { margin: 0 0 10px 0; }
+.shortcut-list { margin: 0 0 12px 18px; padding: 0; display: grid; gap: 6px; }
+.modal-actions { display: flex; justify-content: flex-end; }
+
+/* Narrow filter inputs to keep labels/fields on one row when possible */
+.filters label { white-space: nowrap; margin-right: 0; }
+/* Add group separation between pairs in filters row to mimic Request URL spacing for pairs */
+.filters input + label { margin-left: 24px; }
+#breedFilter { width: clamp(160px, 22vw, 260px); }
+#countryFilter { width: clamp(160px, 22vw, 260px); }
+#globalSearch { width: clamp(280px, 55vw, 520px); }
+
+/* Add a bit of extra space around the Load Defaults row */
+.reset-row { margin-top: 24px; margin-bottom: 8px; }
 .toast { background: #0e141b; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); min-width: 280px; max-width: 420px; }
 .toast p { margin: 0 0 8px 0; color: var(--text); }
 .toast .toast-actions { display: flex; gap: 8px; justify-content: flex-end; }

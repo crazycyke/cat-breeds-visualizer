@@ -19,6 +19,7 @@
   const countryFilterInput = document.getElementById('countryFilter');
   const clearFiltersBtn = document.getElementById('clearFiltersBtn');
   const exportCsvBtn = document.getElementById('exportCsvBtn');
+  const exportCurrentPageBtn = document.getElementById('exportCurrentPageBtn');
 
   // New search and advanced filter elements
   const globalSearchInput = document.getElementById('globalSearch');
@@ -146,6 +147,33 @@
     });
   }
 
+  // Update tooltip for Export CSV button to indicate what will be exported
+  function updateExportTooltip(visibleCount) {
+    if (!exportCsvBtn) return;
+    const filteredCount = filteredData.length;
+    const rawCount = rawData.length;
+    let msg = '';
+    if (rawCount === 0) {
+      msg = 'No data to export yet. Load data first.';
+    } else if (filteredCount > 0) {
+      const shown = (typeof visibleCount === 'number') ? visibleCount : 'some';
+      msg = `Exports all filtered records (${filteredCount}), not just the current page (${shown} shown).`;
+    } else {
+      msg = `No rows match current filters. Export will include all loaded records (${rawCount}).`;
+    }
+    exportCsvBtn.title = msg;
+    exportCsvBtn.setAttribute('aria-label', msg);
+
+    if (exportCurrentPageBtn) {
+      const shown = (typeof visibleCount === 'number') ? visibleCount : 0;
+      const currMsg = rawCount === 0
+        ? 'No data to export yet. Load data first.'
+        : `Exports only the rows currently visible in the table (${shown} shown).`;
+      exportCurrentPageBtn.title = currMsg;
+      exportCurrentPageBtn.setAttribute('aria-label', currMsg);
+    }
+  }
+
   // Client-side pagination for breeds table
   const tablePageSizeEl = document.getElementById('tablePageSize');
   const tablePrevBtn = document.getElementById('tablePrevBtn');
@@ -164,6 +192,7 @@
     const start = (tablePage - 1) * size;
     const slice = filteredData.slice(start, start + size);
     renderTable(slice);
+    updateExportTooltip(slice.length);
     if (tablePageInfoEl) tablePageInfoEl.textContent = `Page ${tablePage} of ${pages} • Total: ${total}`;
     if (tablePrevBtn) tablePrevBtn.disabled = tablePage <= 1;
     if (tableNextBtn) tableNextBtn.disabled = tablePage >= pages;
@@ -606,9 +635,39 @@
   exportCsvBtn.addEventListener('click', () => {
     exportCsv(filteredData.length ? filteredData : rawData);
   });
+  if (exportCurrentPageBtn) exportCurrentPageBtn.addEventListener('click', () => {
+    const size = getTablePageSize();
+    const start = (tablePage - 1) * size;
+    const slice = filteredData.slice(start, start + size);
+    exportCsv(slice);
+  });
 
   // Table pagination events
-  if (tablePageSizeEl) tablePageSizeEl.addEventListener('change', () => { tablePage = 1; renderTableWithPagination(); saveSettings(); });
+  function ensureServerLimitAtLeast(size) {
+    try {
+      const u = new URL(urlInput.value);
+      const currentLimit = Number(u.searchParams.get('limit') || '50');
+      if (size > currentLimit) {
+        u.searchParams.set('limit', String(size));
+        u.searchParams.set('page', '1');
+        urlInput.value = u.toString();
+        limitInput.value = String(size);
+        // Fetch more rows from the server to satisfy the larger page size
+        fetchAndRender(urlInput.value);
+        return true;
+      }
+    } catch {}
+    return false;
+  }
+
+  if (tablePageSizeEl) tablePageSizeEl.addEventListener('change', () => {
+    const size = Number(tablePageSizeEl.value || '50');
+    const refetched = ensureServerLimitAtLeast(size);
+    tablePage = 1;
+    // If we refetched, renderTableWithPagination will be called by fetchAndRender
+    if (!refetched) renderTableWithPagination();
+    saveSettings();
+  });
   if (tablePrevBtn) tablePrevBtn.addEventListener('click', () => { tablePage = Math.max(1, tablePage - 1); renderTableWithPagination(); });
   if (tableNextBtn) tableNextBtn.addEventListener('click', () => { tablePage = tablePage + 1; renderTableWithPagination(); });
 
@@ -857,9 +916,68 @@
   if (autoRefreshFactInput) autoRefreshFactInput.addEventListener('change', () => { saveSettings(); if (autoRefreshFactInput.checked) fetchRandomFact(); updateFactTimer(); });
   if (factIntervalSecInput) factIntervalSecInput.addEventListener('change', () => { saveSettings(); updateFactTimer(); });
 
-  // Initialize
+  // Help modal
+  const helpBtn = document.getElementById('helpBtn');
+  const helpModal = document.getElementById('helpModal');
+  const helpCloseBtn = document.getElementById('helpCloseBtn');
+  function openHelp() { if (helpModal) helpModal.hidden = false; }
+  function closeHelp() { if (helpModal) helpModal.hidden = true; }
+  if (helpBtn) helpBtn.addEventListener('click', openHelp);
+  if (helpCloseBtn) helpCloseBtn.addEventListener('click', closeHelp);
+  if (helpModal) helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
+
+  // Keyboard shortcuts (global)
+  function isTypingTarget(el) {
+    if (!el) return false;
+    const tag = (el.tagName || '').toUpperCase();
+    return el.isContentEditable || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+  }
+  document.addEventListener('keydown', (e) => {
+    if (helpModal && !helpModal.hidden && e.key === 'Escape') { e.preventDefault(); closeHelp(); return; }
+
+    // Cmd/Ctrl+Enter => Execute
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      if (executeBtn) { e.preventDefault(); executeBtn.click(); }
+      return;
+    }
+
+    // Ignore single-key shortcuts while typing
+    if (isTypingTarget(e.target)) return;
+
+    const key = (e.key || '').toLowerCase();
+
+    if (!e.altKey && !e.metaKey && !e.ctrlKey && key === '/') {
+      if (globalSearchInput) { e.preventDefault(); globalSearchInput.focus(); try { globalSearchInput.select(); } catch {} }
+      return;
+    }
+    if (!e.altKey && !e.metaKey && !e.ctrlKey && key === 'g') {
+      if (urlInput) { e.preventDefault(); urlInput.focus(); try { urlInput.select(); } catch {} }
+      return;
+    }
+    if (!e.altKey && !e.metaKey && !e.ctrlKey && key === 'e') {
+      e.preventDefault();
+      if (e.shiftKey) { if (exportCsvBtn) exportCsvBtn.click(); }
+      else { if (exportCurrentPageBtn) exportCurrentPageBtn.click(); }
+      return;
+    }
+
+    if (e.code === 'BracketLeft') {
+      e.preventDefault();
+      if (e.shiftKey) { if (prevPageBtn && !prevPageBtn.disabled) prevPageBtn.click(); }
+      else { if (tablePrevBtn && !tablePrevBtn.disabled) tablePrevBtn.click(); }
+      return;
+    }
+    if (e.code === 'BracketRight') {
+      e.preventDefault();
+      if (e.shiftKey) { if (nextPageBtn && !nextPageBtn.disabled) nextPageBtn.click(); }
+      else { if (tableNextBtn && !tableNextBtn.disabled) tableNextBtn.click(); }
+      return;
+    }
+  });
+
   loadSettings();
   syncLimitFromUrl();
+  updateExportTooltip(0);
   fetchAndRender(urlInput.value);
   fetchRandomFact();
   updateFactTimer();
