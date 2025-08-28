@@ -77,6 +77,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-danger:hover { background: #e55361; border-color: #d73a49; }
 
 #status { color: var(--muted); min-height: 1.5em; }
+.muted-info { color: var(--muted); margin-left: 10px; }
+.control-row > .muted-info:first-child { margin-left: 0; }
 .pagination { justify-content: flex-start; }
 
 .active-filters-row { align-items: center; justify-content: space-between; }
@@ -131,7 +133,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .actions { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 10px; }
 
 /* Toasts */
-#toastContainer { position: fixed; right: 20px; bottom: 20px; display: grid; gap: 8px; z-index: 9999; }
+#toastContainer { position: fixed; left: 50%; top: 35%; transform: translate(-50%, -50%); display: grid; gap: 8px; z-index: 9999; }
 .toast { background: #0e141b; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); min-width: 280px; max-width: 420px; }
 .toast p { margin: 0 0 8px 0; color: var(--text); }
 .toast .toast-actions { display: flex; gap: 8px; justify-content: flex-end; }

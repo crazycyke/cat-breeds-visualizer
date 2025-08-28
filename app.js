@@ -10,6 +10,7 @@
   const resetDefaultBtn = document.getElementById('resetDefaultBtn');
   const statusEl = document.getElementById('status');
   const pageInfoEl = document.getElementById('pageInfo');
+  const totalInfoEl = document.getElementById('totalInfo');
   const prevPageBtn = document.getElementById('prevPageBtn');
   const nextPageBtn = document.getElementById('nextPageBtn');
 
@@ -469,10 +470,12 @@
 
     if (current != null && last != null) {
       pageInfoEl.textContent = `Page ${current} of ${last}${total != null ? ` • Total: ${total}` : ''}`;
+      if (totalInfoEl && total != null) totalInfoEl.textContent = String(total);
       prevPageBtn.disabled = current <= 1;
       nextPageBtn.disabled = current >= last;
     } else {
       pageInfoEl.textContent = '';
+      if (totalInfoEl) totalInfoEl.textContent = '';
       prevPageBtn.disabled = true;
       nextPageBtn.disabled = true;
     }
@@ -578,7 +581,11 @@
     if (factIntervalSecInput) factIntervalSecInput.value = '30';
 
     applyFiltersAndRender();
-    fetchAndRender(urlInput.value, { fallbackOnError: false });
+    await fetchAndRender(urlInput.value, { fallbackOnError: false });
+    const advCtrl = document.getElementById('advancedControls');
+    if (advCtrl) advCtrl.open = false;
+    // Refresh to present a clean initial view
+    location.reload();
   });
 
   limitInput.addEventListener('change', () => {

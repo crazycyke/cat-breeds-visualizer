@@ -39,6 +39,16 @@
         <button id="use100">Use 100 per page</button>
         <button id="executeBtn" class="btn-primary">Execute</button>
       </div>
+      <div class="control-row">
+        <label for="limitInput">Limit</label>
+        <input id="limitInput" type="number" min="1" max="100" step="1" value="1" />
+        <button id="loadBtn">Load Data</button>
+        <span id="status" aria-live="polite"></span>
+      </div>
+      <div class="control-row">
+        <span class="muted-info">Total records available to retrieve from server:</span>
+        <span id="totalInfo" class="muted-info"></span>
+      </div>
       <details id="advancedControls" class="advanced-filters">
         <summary>Advanced</summary>
         <div class="advanced-grid">
@@ -49,12 +59,6 @@
           <button id="resetDefaultBtn" class="btn-danger" title="This will clear filters and local settings, then load defaults">Load default, clear history and execute</button>
         </div>
       </details>
-      <div class="control-row">
-        <label for="limitInput">Limit</label>
-        <input id="limitInput" type="number" min="1" max="100" step="1" value="1" />
-        <button id="loadBtn">Load Data</button>
-        <span id="status" aria-live="polite"></span>
-      </div>
       <h2>Filters</h2>
       <div class="control-row filters">
         <label for="breedFilter">Filter Breed</label>
@@ -62,11 +66,6 @@
         <label for="countryFilter">Filter Country</label>
         <input id="countryFilter" type="text" placeholder="e.g., United Kingdom" />
         <button id="clearFiltersBtn">Clear Filters</button>
-      </div>
-      <div class="control-row pagination">
-        <button id="prevPageBtn" disabled>Prev Page</button>
-        <span id="pageInfo"></span>
-        <button id="nextPageBtn" disabled>Next Page</button>
       </div>
       <div class="control-row">
         <label for="globalSearch">Search all columns</label>
@@ -104,17 +103,23 @@
         <div class="actions">
           <button id="exportCsvBtn">Export CSV</button>
         </div>
+        <div class="control-row api-pagination">
+          <span class="muted-info">Server results:</span>
+          <button id="prevPageBtn" disabled>Prev API Page</button>
+          <span id="pageInfo"></span>
+          <button id="nextPageBtn" disabled>Next API Page</button>
+        </div>
         <div class="control-row table-pagination">
-          <label for="tablePageSize">Rows per page</label>
+          <label for="tablePageSize">Table rows per page</label>
           <select id="tablePageSize">
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50" selected>50</option>
             <option value="100">100</option>
           </select>
-          <button id="tablePrevBtn" disabled>Prev</button>
+          <button id="tablePrevBtn" disabled>Prev Table Page</button>
           <span id="tablePageInfo"></span>
-          <button id="tableNextBtn" disabled>Next</button>
+          <button id="tableNextBtn" disabled>Next Table Page</button>
         </div>
         <div class="table-wrapper">
           <table id="breedsTable">
