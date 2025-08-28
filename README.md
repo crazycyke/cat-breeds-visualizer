@@ -2,13 +2,14 @@
 
 A lightweight, static web app to fetch and visualize cat breed data and facts from catfact.ninja.
 
-<details>
+<details open>
   <summary><strong>Table of contents</strong></summary>
 
+- [Features](#features)
+- [Live demo](#live-demo)
 - [Quick start](#quick-start)
 - [How to use](#how-to-use)
 - [Keyboard shortcuts / Quick tips](#keyboard-shortcuts--quick-tips)
-- [Features](#features)
 - [Notes](#notes)
 - [Privacy](#privacy)
 - [Architecture (Mermaid)](#architecture-mermaid)
