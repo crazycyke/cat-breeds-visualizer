@@ -94,12 +94,16 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .advanced-grid input, .advanced-grid select { width: 100%; }
 
 main { display: grid; gap: 20px; padding: 20px; }
-.table-section, .chart-section, .facts-section, .facts-list-section {
+.table-section, .chart-section, .facts-section, .facts-list-section, .search-section {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 16px;
 }
+
+/* Align Search panel with main content spacing */
+.search-section { margin: 20px; }
+.search-section.controls { border-bottom: none; }
 
 .table-wrapper { overflow: auto; border: 1px solid var(--border); border-radius: 6px; }
 table { width: 100%; border-collapse: collapse; }
