@@ -2,6 +2,19 @@
 
 A lightweight, static web app to fetch and visualize cat breed data and facts from catfact.ninja.
 
+Table of contents
+- [Quick start](#quick-start)
+- [How to use](#how-to-use)
+- [Keyboard shortcuts / Quick tips](#keyboard-shortcuts--quick-tips)
+- [Features](#features)
+- [Notes](#notes)
+- [Privacy](#privacy)
+- [Architecture (Mermaid)](#architecture-mermaid)
+- [Project structure](#project-structure)
+- [Development](#development)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+
 Features
 - Fetch breeds from any compatible endpoint (default: https://catfact.ninja/breeds)
 - Clear separation of pagination:
@@ -22,20 +35,6 @@ Features
 - Random Cat Fact with optional auto-refresh and max fact length
 - Facts list (GET /facts) with pagination, max_length filter, and CSV export
 - Settings persisted locally (URL, headers, filters, sort, pagination, auto-refresh)
-
-Table of contents
-- [Features](#features)
-- [Quick start](#quick-start)
-- [How to use](#how-to-use)
-- [Keyboard shortcuts / Quick tips](#keyboard-shortcuts--quick-tips)
-- [Advanced usage](#advanced-usage)
-- [Notes](#notes)
-- [Privacy](#privacy)
-- [Architecture (Mermaid)](#architecture-mermaid)
-- [Project structure](#project-structure)
-- [Development](#development)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
 
 Live demo
 - If GitHub Pages is enabled, your app will be available at your repository’s Pages URL.
@@ -105,35 +104,35 @@ Privacy
 Architecture (Mermaid)
 ```mermaid
 flowchart LR
-  subgraph UI[Browser UI]
-    A[Controls (URL, Limit, Execute, buttons)]
-    F1[Filters (basic, global, advanced)]
-    P[API Pagination + Server Total]
-    B[Breeds Table]
-    TP[Table Pagination]
-    X[Export All / Current Page]
-    C[Breeds by Country Chart]
-    D[Random Fact Card]
-    E[Facts List]
+  subgraph UI["Browser UI"]
+    A["Controls: URL, Limit, Execute, buttons"]
+    F1["Filters: basic, global, advanced"]
+    P["API Pagination + Server Total"]
+    B["Breeds Table"]
+    TP["Table Pagination"]
+    X["Export: All / Current Page"]
+    C["Breeds by Country Chart"]
+    D["Random Fact Card"]
+    E["Facts List"]
   end
 
-  A -->|updates| S[State in localStorage]
+  A -->|updates| S["State in localStorage"]
   F1 -->|updates| S
   A -->|fetch breeds| J
   P -->|change page| J
   D -->|fetch random fact| F
   E -->|fetch facts list| FL
 
-  J[app.js] -->|render| B
+  J["app.js"] -->|render| B
   J -->|render| C
   J -->|persist| S
   TP -->|client paginate| B
   X -->|CSV download| B
 
-  F[GET https://catfact.ninja/fact]
-  FL[GET https://catfact.ninja/facts]
-  API[(catfact.ninja)]
-  J -->|GET /breeds*| API
+  F["GET https://catfact.ninja/fact"]
+  FL["GET https://catfact.ninja/facts"]
+  API[["catfact.ninja"]]
+  J -->|GET /breeds| API
   D --> F
   E --> FL
 
