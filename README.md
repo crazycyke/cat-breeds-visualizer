@@ -41,7 +41,8 @@ A lightweight, static web app to fetch and visualize cat breed data and facts fr
 - Settings persisted locally (URL, headers, filters, sort, pagination, auto-refresh)
 
 ## Live demo
-- If GitHub Pages is enabled, your app will be available at your repository’s Pages URL.
+- GitHub Pages: https://crazycyke.github.io/cat-breeds-visualizer/
+- If the URL changes, check your repository’s Pages settings for the current address.
 
 ## Quick start
 - Option A: Open index.html directly in a modern browser.
