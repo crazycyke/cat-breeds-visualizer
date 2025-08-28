@@ -15,6 +15,7 @@ A lightweight, static web app to fetch and visualize cat breed data and facts fr
 - [Architecture (Mermaid)](#architecture-mermaid)
 - [Project structure](#project-structure)
 - [Development](#development)
+- [Testing](#testing)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -155,6 +156,139 @@ flowchart LR
 - No build step; pure HTML/CSS/JS
 - Dependencies: Chart.js via CDN only
 - Works on any modern browser with network access to catfact.ninja
+
+## Testing
+
+This project uses [Playwright](https://playwright.dev/) for end-to-end testing across Chromium, Firefox, and WebKit browsers.
+
+### Prerequisites
+- Node.js 18.0.0 or higher
+- npm (comes with Node.js)
+
+### Installation
+
+Install dependencies:
+```bash
+npm install
+```
+
+Install Playwright browsers:
+```bash
+npx playwright install
+```
+
+### Running tests
+
+**Run all tests (headless):**
+```bash
+npm test
+```
+
+**Run tests with UI mode (interactive):**
+```bash
+npm run test:ui
+```
+
+**Run tests in headed mode (see browser):**
+```bash
+npm run test:headed
+```
+
+**Debug tests step by step:**
+```bash
+npm run test:debug
+```
+
+**View test report:**
+```bash
+npm run test:report
+```
+
+### Test structure
+
+Tests are organized in the `tests/` directory:
+
+- **basic-functionality.spec.js** - Core app loading, UI components, help modal
+- **search-and-filters.spec.js** - Search functionality, filters, advanced filters
+- **keyboard-shortcuts.spec.js** - All keyboard shortcuts and hotkeys
+- **pagination-and-export.spec.js** - API pagination, table pagination, CSV exports
+- **utils/test-helpers.js** - Common test utilities and API mocking
+
+### What the tests cover
+
+✅ **Basic functionality:**
+- App loading and initial state
+- Default data fetch (50 cat breeds)
+- Chart rendering
+- Help modal functionality
+- Error handling
+
+✅ **Search and filtering:**
+- Global search across all columns
+- Origin and temperament filters
+- Advanced filters with multiple criteria
+- Filter combinations
+- Clear filters functionality
+
+✅ **Keyboard shortcuts:**
+- Cmd/Ctrl+Enter to execute
+- `/` to focus search
+- `g` to focus Request URL
+- `e` and Shift+E for exports
+- Bracket keys for pagination navigation
+
+✅ **Pagination and exports:**
+- API pagination (server-side)
+- Table pagination (client-side)
+- Auto-increase server limit feature
+- CSV export (all data vs current page)
+- Dynamic export tooltips
+
+✅ **Data handling:**
+- API mocking for reliable tests
+- Large dataset pagination
+- Empty result handling
+- Filter state persistence
+
+### Test configuration
+
+The tests use mocked API responses for reliability and speed. Key configuration:
+
+- **Base URL:** http://localhost:8081 (auto-started web server)
+- **Browsers:** Chromium, Firefox, WebKit
+- **Parallelization:** Enabled for faster execution
+- **Screenshots:** Captured on test failures
+- **Videos:** Recorded for failed tests
+- **Traces:** Available for debugging
+
+### Writing new tests
+
+Use the `TestHelpers` class for common operations:
+
+```javascript
+const { test, expect } = require('@playwright/test');
+const TestHelpers = require('./utils/test-helpers');
+
+test('my new test', async ({ page }) => {
+  const helpers = new TestHelpers(page);
+  
+  // Mock API with custom data
+  await helpers.mockCatAPI({ totalCount: 100 });
+  
+  await page.goto('/');
+  await helpers.waitForAppLoad();
+  
+  // Your test logic here
+});
+```
+
+### Continuous Integration
+
+For CI environments, tests automatically:
+- Retry failed tests up to 2 times
+- Run with only 1 worker (sequential)
+- Generate HTML reports
+- Capture artifacts on failures
 
 ## Troubleshooting
 - Network/CORS: catfact.ninja supports cross-origin requests; if a corporate proxy blocks it, try another network.
