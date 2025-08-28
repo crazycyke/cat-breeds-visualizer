@@ -101,8 +101,9 @@ main { display: grid; gap: 20px; padding: 20px; }
   padding: 16px;
 }
 
-/* Align Search panel with main content spacing */
+/* Align Search and Facts panels with main content spacing */
 .search-section { margin: 20px; }
+.facts-section { margin: 20px; }
 .search-section.controls { border-bottom: none; }
 
 .table-wrapper { overflow: auto; border: 1px solid var(--border); border-radius: 6px; }
