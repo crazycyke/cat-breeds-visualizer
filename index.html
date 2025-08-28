@@ -45,12 +45,14 @@
           <label for="acceptHeader">Accept header</label>
           <input id="acceptHeader" type="text" value="application/json" />
         </div>
+        <div class="control-row">
+          <button id="resetDefaultBtn" class="btn-danger" title="This will clear filters and local settings, then load defaults">Load default, clear history and execute</button>
+        </div>
       </details>
       <div class="control-row">
         <label for="limitInput">Limit</label>
         <input id="limitInput" type="number" min="1" max="100" step="1" value="1" />
         <button id="loadBtn">Load Data</button>
-        <button id="resetDefaultBtn">Load default, clear history and execute</button>
         <span id="status" aria-live="polite"></span>
       </div>
       <h2>Filters</h2>

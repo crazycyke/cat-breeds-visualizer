@@ -540,7 +540,9 @@
     fetchAndRender(urlInput.value);
   });
 
-  if (resetDefaultBtn) resetDefaultBtn.addEventListener('click', () => {
+  if (resetDefaultBtn) resetDefaultBtn.addEventListener('click', async () => {
+    const proceed = await confirmToast('This will clear all filters and local settings, then load default data.', 'Proceed');
+    if (!proceed) return;
     try { localStorage.removeItem('cbv_state'); } catch {}
     // Reset controls to defaults
     urlInput.value = defaultBreedsUrl();
